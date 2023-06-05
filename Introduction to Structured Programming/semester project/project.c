@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #define MAX 60
 
@@ -19,7 +20,7 @@ void automaticMode(int board[][MAX], int startingLocations[][4], int N, int curr
 int main() {
     int board[MAX][MAX], choice, startingLocations[MAX][4], N, M, scores[MAX][MAX], gameCounter[MAX] = {0}, currentPlayer, numberOfUndos;
     int randomOrFileScore, manualOrAutoScore, successCheck, avarageScores[MAX] = {0}, currentLabel, counter, isAutoCompleted, resultMatrix[MAX][MAX];
-	char fileName[20];
+    char fileName[20];
 
     printf("number of players: ");
     scanf("%d", &M);
@@ -33,10 +34,10 @@ int main() {
         printf("Exit: 4\n");
         printf("choice: ");
         scanf("%d", &choice);
-        
+
         if (choice == 3) {
-        	showUserScores(scores, gameCounter, avarageScores, M);
-		}
+            showUserScores(scores, gameCounter, avarageScores, M);
+        }
 
         if (choice == 1 || choice == 2) {
             printf("dimension of board: ");
@@ -57,7 +58,7 @@ int main() {
                 startingLocationsFunction(board, N, startingLocations);
                 randomOrFileScore = N * 2;
             }
-            
+
             printf("enter current player number (1 to %d): ", M);
             scanf("%d", &currentPlayer);
 
@@ -72,43 +73,41 @@ int main() {
             numberOfUndos = 0;
 
             if (choice == 1) {
-            	manualMode(board, N, currentPlayer, &numberOfUndos);
-				drawBoard(board, N);	
+                manualMode(board, N, currentPlayer, &numberOfUndos);
+                drawBoard(board, N);
                 manualOrAutoScore = N * 4;
             }
 
             else if (choice == 2) {
-            	currentLabel = 1;
-            	isAutoCompleted = 0;
-            	counter = 0;
-            	automaticMode(board, startingLocations, N, currentLabel, startingLocations[0][0], startingLocations[0][1], &counter, &isAutoCompleted, resultMatrix);
-            	matrixCopy(resultMatrix, board, N);
-            	drawBoard(board ,N);
+                currentLabel = 1;
+                isAutoCompleted = 0;
+                counter = 0;
+                automaticMode(board, startingLocations, N, currentLabel, startingLocations[0][0], startingLocations[0][1], &counter, &isAutoCompleted, resultMatrix);
+                matrixCopy(resultMatrix, board, N);
+                drawBoard(board, N);
                 manualOrAutoScore = N * 2;
                 numberOfUndos = 1;
             }
-			
-			successCheck = 0;    
-			if (choice == 1 || choice == 2) {							
-	            successCheck = successCheckFunction(board, N, startingLocations);
-				
-				if (successCheck) {
-					printf("\nCongratulations! The game was successfully completed.\n");				
-	                scores[currentPlayer][gameCounter[currentPlayer]] = randomOrFileScore + manualOrAutoScore - 2 * numberOfUndos;
-	            } 
-				else {
-	            	if (choice == 1) printf("\nThe game was not successfully completed.\n");
-	            	if (choice == 2) printf("\nThere are no available solutions.\n");
-	                scores[currentPlayer][gameCounter[currentPlayer]] = 0;
-	            }
-				
-	            gameCounter[currentPlayer]++;
+
+            successCheck = 0;
+            if (choice == 1 || choice == 2) {
+                successCheck = successCheckFunction(board, N, startingLocations);
+
+                if (successCheck) {
+                    printf("\nCongratulations! The game was successfully completed.\n");
+                    scores[currentPlayer][gameCounter[currentPlayer]] = randomOrFileScore + manualOrAutoScore - 2 * numberOfUndos;
+                } else {
+                    if (choice == 1) printf("\nThe game was not successfully completed.\n");
+                    if (choice == 2) printf("\nThere are no available solutions.\n");
+                    scores[currentPlayer][gameCounter[currentPlayer]] = 0;
+                }
+
+                gameCounter[currentPlayer]++;
             }
-            
         }
-    
+
     } while (choice != 4);
-    
+
     return 0;
 }
 
@@ -121,7 +120,7 @@ void readFromFile(int matrix[][MAX], char *fileName) {
     }
     while (!feof(data)) {
         fscanf(data, "%d %d %d\n", &i, &j, &temp);
-        matrix[i][j] = temp;	
+        matrix[i][j] = temp;
     }
     fclose(data);
 }
@@ -178,39 +177,37 @@ void randomMatrix(int matrix[][MAX], int N, int startingLocations[][4]) {
 }
 
 void startingLocationsFunction(int matrix[][MAX], int N, int startingLocations[][4]) {
-	int i, j, used[MAX] = {0};
-	
-	for (i = 0; i < N; i++) {
-		for (j = 0; j < N; j++) {			
-			if (matrix[i][j] != 0) {
-				if (used[matrix[i][j]] != 0) {
-					startingLocations[matrix[i][j] - 1][0] = i;
-					startingLocations[matrix[i][j] - 1][1] = j;
-				}
-				else {
-					startingLocations[matrix[i][j] - 1][2] = i;
-					startingLocations[matrix[i][j] - 1][3] = j;
-				}
-				used[matrix[i][j]]++;
-			}
-			
-		}
-	}
+    int i, j, used[MAX] = {0};
+
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            if (matrix[i][j] != 0) {
+                if (used[matrix[i][j]] != 0) {
+                    startingLocations[matrix[i][j] - 1][0] = i;
+                    startingLocations[matrix[i][j] - 1][1] = j;
+                } else {
+                    startingLocations[matrix[i][j] - 1][2] = i;
+                    startingLocations[matrix[i][j] - 1][3] = j;
+                }
+                used[matrix[i][j]]++;
+            }
+        }
+    }
 }
 
 void showUserScores(int scores[][MAX], int gameCounter[], int avarageScores[], int M) {
-	int i, j;
-	
-	for (i = 1; i <= M; i++) {
-		if (scores[i][0]) {
-			avarageScores[i] = 0;
-			for (j = 0; j < gameCounter[i]; j++) {
-    		avarageScores[i] += scores[i][j];		
-			}
-			avarageScores[i] /= gameCounter[i];
-		}
-		printf("Score of player %d: %d\n", i, avarageScores[i]);
-	}
+    int i, j;
+
+    for (i = 1; i <= M; i++) {
+        if (scores[i][0]) {
+            avarageScores[i] = 0;
+            for (j = 0; j < gameCounter[i]; j++) {
+                avarageScores[i] += scores[i][j];
+            }
+            avarageScores[i] /= gameCounter[i];
+        }
+        printf("Score of player %d: %d\n", i, avarageScores[i]);
+    }
 }
 
 void manualFunction(int matrix[][MAX], int N, int steps[][4], int stepCounter) {
@@ -283,43 +280,42 @@ void undoFunction(int matrix[][MAX], int N, int steps[][4], int stepCounter) {
 }
 
 int successCheckFunction(int matrix[][MAX], int N, int startingLocations[][4]) {
-	int i, j, k, counter, control, zeroMatrix[MAX][MAX] = {{0}};
-	
-	for (i = 0; i < N; i++)
-		for (j = 0; j < N; j++)
-			if (matrix[i][j] == zeroMatrix[i][j])
-				return 0;
+    int i, j, k, counter, control, zeroMatrix[MAX][MAX] = {{0}};
 
-	for (i = 0; i < N; i++) {
-	    for (j = 0; j < N; j++) {
-	    	control = 0;
-	    	k = 0;
-	    	while (k < N && !control) {
-	    		if ((i == startingLocations[k][0] && j == startingLocations[k][1]) || (i == startingLocations[k][2] && j == startingLocations[k][3])) control = 1;
-	    		k++;
-			}
-	    	
-	        counter = 0;
-			if (control) {
-				if (matrix[i + 1][j] == matrix[i][j]) counter++;
-			    if (matrix[i][j + 1] == matrix[i][j]) counter++;
-			    if (matrix[i - 1][j] == matrix[i][j]) counter++;
-			    if (matrix[i][j - 1] == matrix[i][j]) counter++;
+    for (i = 0; i < N; i++)
+        for (j = 0; j < N; j++)
+            if (matrix[i][j] == zeroMatrix[i][j])
+                return 0;
 
-			    if (counter < 1) return 0;
-			}
-			else {
-				if (matrix[i + 1][j] == matrix[i][j]) counter++;
-			    if (matrix[i][j + 1] == matrix[i][j]) counter++;
-			    if (matrix[i - 1][j] == matrix[i][j]) counter++;
-			    if (matrix[i][j - 1] == matrix[i][j]) counter++;
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            control = 0;
+            k = 0;
+            while (k < N && !control) {
+                if ((i == startingLocations[k][0] && j == startingLocations[k][1]) || (i == startingLocations[k][2] && j == startingLocations[k][3])) control = 1;
+                k++;
+            }
 
-			    if (counter < 2) return 0;
-			}   	
-	    }
-	}	
-	
-	return 1;
+            counter = 0;
+            if (control) {
+                if (matrix[i + 1][j] == matrix[i][j]) counter++;
+                if (matrix[i][j + 1] == matrix[i][j]) counter++;
+                if (matrix[i - 1][j] == matrix[i][j]) counter++;
+                if (matrix[i][j - 1] == matrix[i][j]) counter++;
+
+                if (counter < 1) return 0;
+            } else {
+                if (matrix[i + 1][j] == matrix[i][j]) counter++;
+                if (matrix[i][j + 1] == matrix[i][j]) counter++;
+                if (matrix[i - 1][j] == matrix[i][j]) counter++;
+                if (matrix[i][j - 1] == matrix[i][j]) counter++;
+
+                if (counter < 2) return 0;
+            }
+        }
+    }
+
+    return 1;
 }
 
 void manualMode(int matrix[][MAX], int N, int currentPlayer, int *numberOfUndos) {
@@ -351,51 +347,48 @@ void manualMode(int matrix[][MAX], int N, int currentPlayer, int *numberOfUndos)
 }
 
 void matrixCopy(int matrix1[][MAX], int matrix2[][MAX], int N) {
-	int i, j;
-	
-	for (i = 0; i < N; i++) {
-		for (j = 0; j < N; j++) {
-			matrix2[i][j] = matrix1[i][j];
-		}
-	}
+    int i, j;
+
+    for (i = 0; i < N; i++) {
+        for (j = 0; j < N; j++) {
+            matrix2[i][j] = matrix1[i][j];
+        }
+    }
 }
 
-void automaticMode(int board[][MAX], int startingLocations[][4], int N, int currentLabel, int row, int column, int *counter, int *isAutoCompleted,int resultMatrix[][MAX]) {
-	int i, j, direction, dx[] = {+1, 0, -1, 0}, dy[] = {0, +1, 0, -1};
-	int matrix[MAX][MAX];
+void automaticMode(int board[][MAX], int startingLocations[][4], int N, int currentLabel, int row, int column, int *counter, int *isAutoCompleted, int resultMatrix[][MAX]) {
+    int i, j, direction, dx[] = {+1, 0, -1, 0}, dy[] = {0, +1, 0, -1};
+    int matrix[MAX][MAX];
 
-	if (*isAutoCompleted == 0) {
-		// If you'd like to see results sooner, you can remove this block as it takes time to draw boards.
-		drawBoard(board, N);
-		printf("\n");
-		//***********************************************************************************************
-	}
-	else return;
-		
-	matrixCopy(board, matrix, N);
+    if (*isAutoCompleted == 0) {
+        // If you'd like to see results sooner, you can remove this block as it takes time to draw boards.
+        drawBoard(board, N);
+        printf("\n");
+        //***********************************************************************************************
+    } else return;
 
-	if (row < 0 || row >= N) return;	
+    matrixCopy(board, matrix, N);
+
+    if (row < 0 || row >= N) return;
     if (column < 0 || column >= N) return;
-	
-	if (row == startingLocations[currentLabel - 1][2] && column == startingLocations[currentLabel - 1][3]) {
-		if (currentLabel < N) {
-			currentLabel++;
-			*counter = 0;
-			automaticMode(matrix, startingLocations, N, currentLabel, startingLocations[currentLabel - 1][0], startingLocations[currentLabel - 1][1], counter, isAutoCompleted, resultMatrix);
-		}
-		else if (currentLabel == N && successCheckFunction(matrix, N, startingLocations)) {
-			matrixCopy(matrix, resultMatrix, N);
-			*isAutoCompleted = 1;	
-			return;
-		}	
-	}
-	
-	if (*counter != 0 && matrix[row][column]) return;
-	
-	(*counter)++;
-	matrix[row][column] = currentLabel;
-	
-	for (direction = 0; direction < 4; ++direction)
-		automaticMode(matrix, startingLocations, N, currentLabel, row + dx[direction], column + dy[direction], counter, isAutoCompleted, resultMatrix);
 
+    if (row == startingLocations[currentLabel - 1][2] && column == startingLocations[currentLabel - 1][3]) {
+        if (currentLabel < N) {
+            currentLabel++;
+            *counter = 0;
+            automaticMode(matrix, startingLocations, N, currentLabel, startingLocations[currentLabel - 1][0], startingLocations[currentLabel - 1][1], counter, isAutoCompleted, resultMatrix);
+        } else if (currentLabel == N && successCheckFunction(matrix, N, startingLocations)) {
+            matrixCopy(matrix, resultMatrix, N);
+            *isAutoCompleted = 1;
+            return;
+        }
+    }
+
+    if (*counter != 0 && matrix[row][column]) return;
+
+    (*counter)++;
+    matrix[row][column] = currentLabel;
+
+    for (direction = 0; direction < 4; ++direction)
+        automaticMode(matrix, startingLocations, N, currentLabel, row + dx[direction], column + dy[direction], counter, isAutoCompleted, resultMatrix);
 }
