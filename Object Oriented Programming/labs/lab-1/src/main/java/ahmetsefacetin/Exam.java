@@ -25,7 +25,7 @@ public class Exam {
 
     @Override
     public String toString() {
-        return "exam=Exam [score=" + score + "]]";
+        return "exam=Exam [score=" + score + "]";
     }
 
     
