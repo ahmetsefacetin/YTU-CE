@@ -43,7 +43,7 @@ public class Student {
 
     @Override
     public String toString() {
-        return "Student [stdNo=" + stdNo + ", name=" + name + ", age=" + age + ", " + exam.toString();
+        return "Student [stdNo=" + stdNo + ", name=" + name + ", age=" + age + ", " + exam.toString() + "]";
     }
 
     /**
